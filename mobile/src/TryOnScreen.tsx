@@ -2,6 +2,7 @@ import Constants from 'expo-constants';
 import type { ComponentType } from 'react';
 
 import type { CatalogueItem } from './data';
+import { usesManualTryOn } from './runtime';
 import ExpoGoTryOn from './TryOnExpoGo';
 
 type Props = {
@@ -10,7 +11,9 @@ type Props = {
 };
 
 export default function TryOnScreen(props: Props) {
-  const isExpoGo = Boolean(Constants.expoGoConfig) || Constants.appOwnership === 'expo';
+  // Expo Go cannot load the custom native face detector. Internal/standalone
+  // APKs are not Store Client builds and must open TryOnNative.
+  const isExpoGo = usesManualTryOn(Constants.executionEnvironment);
 
   if (isExpoGo) {
     return <ExpoGoTryOn {...props} />;

@@ -12,7 +12,7 @@ export type Overlay = {
 };
 
 const REFERENCE_OPTICAL_WIDTH_MM = 124;
-const EYE_DISTANCE_TO_FRAME = 2.22;
+const EYE_DISTANCE_TO_FRAME = 2.36;
 
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -54,8 +54,12 @@ export function overlayFromEyes(input: {
     userScale = 1,
     userOffsetY = 0,
   } = input;
-  const dx = rightEye.x - leftEye.x;
-  const dy = rightEye.y - leftEye.y;
+  // ML Kit names eyes from the person's point of view. On a mirrored front
+  // camera their x positions can be reversed, so order them on screen first.
+  const screenLeftEye = leftEye.x <= rightEye.x ? leftEye : rightEye;
+  const screenRightEye = leftEye.x <= rightEye.x ? rightEye : leftEye;
+  const dx = screenRightEye.x - screenLeftEye.x;
+  const dy = screenRightEye.y - screenLeftEye.y;
   const eyeDistance = Math.sqrt(dx * dx + dy * dy);
   const yawScale = yawScaleFor(yawAngle, calibration.yawResponse);
   const rawWidth =
@@ -65,14 +69,14 @@ export function overlayFromEyes(input: {
     calibration.scale *
     userScale *
     yawScale;
-  const width = clamp(rawWidth, viewportWidth * 0.46, viewportWidth * 0.96);
+  const width = clamp(rawWidth, viewportWidth * 0.58, viewportWidth * 0.98);
   const height = width / calibration.aspect;
   const centerX =
-    (leftEye.x + rightEye.x) / 2 +
+    (screenLeftEye.x + screenRightEye.x) / 2 +
     width * calibration.offsetX +
     (yawAngle / 52) * width * 0.035;
   const centerY =
-    (leftEye.y + rightEye.y) / 2 +
+    (screenLeftEye.y + screenRightEye.y) / 2 +
     width * calibration.offsetY +
     userOffsetY;
 
@@ -110,9 +114,9 @@ export function overlayFromBounds(input: {
   } = input;
   const yawScale = yawScaleFor(yawAngle, calibration.yawResponse);
   const width = clamp(
-    bounds.width * 1.06 * physicalScale(opticalWidth) * calibration.scale * userScale * yawScale,
-    viewportWidth * 0.46,
-    viewportWidth * 0.96,
+    bounds.width * 1.22 * physicalScale(opticalWidth) * calibration.scale * userScale * yawScale,
+    viewportWidth * 0.58,
+    viewportWidth * 0.98,
   );
   const height = width / calibration.aspect;
   const centerX =

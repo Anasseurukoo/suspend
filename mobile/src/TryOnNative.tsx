@@ -13,6 +13,8 @@ import {
 import { eyewear, type CatalogueItem } from './data';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const DEFAULT_FRAME_SCALE = 1.08;
+const LOST_FACE_GRACE_MS = 420;
 
 export default function TryOnNative({
   initial,
@@ -26,37 +28,58 @@ export default function TryOnNative({
   const [active, setActive] = useState(initial);
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [error, setError] = useState('');
-  const [userScale, setUserScale] = useState(1);
+  const [userScale, setUserScale] = useState(DEFAULT_FRAME_SCALE);
   const [userOffsetY, setUserOffsetY] = useState(0);
   const previous = useRef<Overlay | null>(null);
   const lastUpdate = useRef(0);
+  const lastFaceSeen = useRef(0);
 
   useEffect(() => {
     previous.current = null;
     setOverlay(null);
-    setUserScale(1);
+    setUserScale(DEFAULT_FRAME_SCALE);
     setUserOffsetY(0);
   }, [active]);
 
   const handleFaces = useCallback(
     (faces: Face[]) => {
       const now = Date.now();
-      if (now - lastUpdate.current < 55) return;
+      // Roughly 25–30 tracking updates per second: responsive without overloading ML Kit.
+      if (now - lastUpdate.current < 36) return;
       lastUpdate.current = now;
 
-      const face = faces[0];
+      // Always follow the largest visible face instead of depending on array order.
+      const face = faces.reduce<Face | null>((largest, candidate) => {
+        if (!largest) return candidate;
+        const largestArea = largest.bounds.width * largest.bounds.height;
+        const candidateArea = candidate.bounds.width * candidate.bounds.height;
+        return candidateArea > largestArea ? candidate : largest;
+      }, null);
+
       if (!face) {
-        setOverlay(null);
-        previous.current = null;
+        // Keep the last good position briefly so a single missed frame does not blink.
+        if (now - lastFaceSeen.current > LOST_FACE_GRACE_MS) {
+          setOverlay(null);
+          previous.current = null;
+        }
         return;
       }
+      lastFaceSeen.current = now;
 
       const leftEye = face.landmarks?.LEFT_EYE;
       const rightEye = face.landmarks?.RIGHT_EYE;
       const yawAngle = face.yawAngle ?? 0;
+      const eyeDistance =
+        leftEye && rightEye
+          ? Math.hypot(rightEye.x - leftEye.x, rightEye.y - leftEye.y)
+          : 0;
+      const eyesAreReliable =
+        Boolean(leftEye && rightEye) &&
+        eyeDistance > SCREEN_WIDTH * 0.07 &&
+        eyeDistance < SCREEN_WIDTH * 0.72;
       let next: Overlay;
 
-      if (leftEye && rightEye) {
+      if (leftEye && rightEye && eyesAreReliable) {
         next = overlayFromEyes({
           leftEye,
           rightEye,
@@ -82,7 +105,13 @@ export default function TryOnNative({
         });
       }
 
-      const smooth = smoothOverlay(previous.current, next, 0.3);
+      const current = previous.current;
+      const movement = current
+        ? Math.hypot(next.left - current.left, next.top - current.top) / SCREEN_WIDTH
+        : 1;
+      const sizeChange = current ? Math.abs(next.width - current.width) / SCREEN_WIDTH : 1;
+      const responsiveAlpha = Math.min(0.68, Math.max(0.42, 0.42 + movement * 1.2 + sizeChange));
+      const smooth = smoothOverlay(current, next, responsiveAlpha);
 
       previous.current = smooth;
       setOverlay(smooth);
@@ -124,6 +153,7 @@ export default function TryOnNative({
           windowWidth={SCREEN_WIDTH}
           windowHeight={SCREEN_HEIGHT}
           performanceMode="fast"
+          minFaceSize={0.12}
           outputResolution="preview"
           runLandmarks
           trackingEnabled
@@ -170,7 +200,7 @@ export default function TryOnNative({
         </View>
         <View style={styles.live}>
           <View style={styles.liveDot} />
-          <Text style={styles.liveText}>LIVE 2.5D</Text>
+          <Text style={styles.liveText}>LIVE NATIVE</Text>
         </View>
       </View>
 
@@ -202,7 +232,7 @@ export default function TryOnNative({
         <Pressable
           style={styles.controlButton}
           onPress={() => {
-            setUserScale(1);
+            setUserScale(DEFAULT_FRAME_SCALE);
             setUserOffsetY(0);
           }}
         >

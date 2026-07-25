@@ -1,6 +1,6 @@
 {
   "name": "loza-optique-mobile",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
@@ -9,7 +9,8 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "test:ar": "node --experimental-strip-types --test tests/ar-geometry.test.ts",
-    "check": "npm run typecheck && npm run test:ar"
+    "check": "npm run typecheck && npm run test:ar && npm run test:runtime",
+    "test:runtime": "node --experimental-strip-types --test tests/runtime-routing.test.ts"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -18,9 +19,7 @@
     "expo-camera": "~57.0.3",
     "expo-constants": "~57.0.6",
     "expo-dev-client": "~57.0.2",
-    "expo-document-picker": "~57.0.1",
     "expo-font": "~57.0.1",
-    "expo-file-system": "~57.0.1",
     "expo-linear-gradient": "~57.0.1",
     "expo-splash-screen": "~57.0.4",
     "expo-status-bar": "~57.0.1",

@@ -93,3 +93,17 @@ test('angles normalize across full turns', () => {
   assert.equal(normalizeAngle(370), 10);
   assert.equal(normalizeAngle(-190), 170);
 });
+
+
+test('mirrored eye landmark order still produces an upright large frame', () => {
+  const overlay = overlayFromEyes({
+    leftEye: { x: 260, y: 250 },
+    rightEye: { x: 130, y: 252 },
+    viewportWidth: 390,
+    viewportHeight: 844,
+    opticalWidth: 124,
+    calibration,
+  });
+  assert.ok(Math.abs(overlay.rotation) < 5);
+  assert.ok(overlay.width >= 390 * 0.58);
+});

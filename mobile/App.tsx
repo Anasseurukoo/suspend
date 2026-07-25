@@ -1,7 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
-import * as DocumentPicker from 'expo-document-picker';
-import * as FileSystem from 'expo-file-system/legacy';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useMemo, useState } from 'react';
@@ -79,7 +77,7 @@ function buildBookingDays(): BookingDay[] {
 function Logo({ light = false, compact = false }: { light?: boolean; compact?: boolean }) {
   return (
     <Image
-      source={require('./assets/brand/logo-horizontal.png')}
+      source={require('./assets/brand/logo-mark.png')}
       style={[styles.logo, compact && styles.logoCompact, light && styles.logoLight]}
       resizeMode="contain"
     />
@@ -217,46 +215,30 @@ function AppContent() {
   const bookingDays = useMemo(buildBookingDays, []);
   const [bookingDay, setBookingDay] = useState(bookingDays[0]?.id ?? '');
   const [bookingTime, setBookingTime] = useState('15:30');
-  const [prescriptionName, setPrescriptionName] = useState('');
-  const [prescriptionUri, setPrescriptionUri] = useState('');
 
   useEffect(() => {
-    Promise.all([
-      AsyncStorage.getItem('@loza/favorites'),
-      AsyncStorage.getItem('@loza/prescription'),
-      AsyncStorage.getItem('@loza/prescription-name'),
-    ])
-      .then(([storedFavorites, storedPrescription, legacyPrescriptionName]) => {
-        if (storedFavorites) setFavorites(JSON.parse(storedFavorites) as string[]);
-        if (storedPrescription) {
-          const prescription = JSON.parse(storedPrescription) as { name: string; uri: string };
-          setPrescriptionName(prescription.name);
-          setPrescriptionUri(prescription.uri);
-        } else if (legacyPrescriptionName) {
-          void AsyncStorage.removeItem('@loza/prescription-name');
+    let active = true;
+    void (async () => {
+      try {
+        const storedFavorites = await AsyncStorage.getItem('@loza/favorites');
+        if (active && storedFavorites) {
+          setFavorites(JSON.parse(storedFavorites) as string[]);
         }
-      })
-      .catch(() => undefined)
-      .finally(() => setStorageReady(true));
+      } catch {
+        // Keep the app usable if local storage is unavailable.
+      } finally {
+        if (active) setStorageReady(true);
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
     if (!storageReady) return;
     void AsyncStorage.setItem('@loza/favorites', JSON.stringify(favorites));
   }, [favorites, storageReady]);
-
-  useEffect(() => {
-    if (!storageReady) return;
-    if (prescriptionName && prescriptionUri) {
-      void AsyncStorage.setItem(
-        '@loza/prescription',
-        JSON.stringify({ name: prescriptionName, uri: prescriptionUri }),
-      );
-      void AsyncStorage.removeItem('@loza/prescription-name');
-    } else {
-      void AsyncStorage.removeItem('@loza/prescription');
-    }
-  }, [prescriptionName, prescriptionUri, storageReady]);
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -279,36 +261,11 @@ function AppContent() {
     );
   };
 
-  const pickPrescription = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
-      copyToCacheDirectory: true,
-      multiple: false,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      const asset = result.assets[0];
-      if (prescriptionUri && prescriptionUri !== asset.uri) {
-        await FileSystem.deleteAsync(prescriptionUri, { idempotent: true }).catch(() => undefined);
-      }
-      setPrescriptionName(asset.name);
-      setPrescriptionUri(asset.uri);
-    }
-  };
-
-  const removePrescription = async () => {
-    if (prescriptionUri) {
-      await FileSystem.deleteAsync(prescriptionUri, { idempotent: true }).catch(() => undefined);
-    }
-    setPrescriptionName('');
-    setPrescriptionUri('');
-  };
-
   const confirmBooking = async () => {
     const day = bookingDays.find((item) => item.id === bookingDay);
     const subject = encodeURIComponent('Demande de rendez-vous — Loza Optique');
     const body = encodeURIComponent(
-      `Bonjour Loza Optique,\n\nJe souhaite demander un rendez-vous :\nDate : ${day?.longLabel ?? bookingDay}\nHeure : ${bookingTime}\nOrdonnance : ${prescriptionName || 'Non jointe'}\n\nMerci.`,
+      `Bonjour Loza Optique,\n\nJe souhaite demander un rendez-vous :\nDate : ${day?.longLabel ?? bookingDay}\nHeure : ${bookingTime}\n\nMerci.`,
     );
 
     const emailUrl = `mailto:lozaoptique@gmail.com?subject=${subject}&body=${body}`;
@@ -563,34 +520,23 @@ function AppContent() {
         <Logo light />
         <Text style={styles.profileHeroTitle}>Votre expérience optique,{'\n'}simplement.</Text>
         <Text style={styles.profileHeroText}>
-          Favoris, ordonnance, rendez-vous et services Loza.
+          Favoris, rendez-vous, essayage virtuel et services Loza.
         </Text>
       </LinearGradient>
 
-      <View style={styles.prescriptionCard}>
-        <View style={styles.prescriptionIcon}>
-          <Text style={styles.prescriptionIconText}>Rx</Text>
+      <View style={styles.profileFeatureCard}>
+        <View style={styles.profileFeatureIcon}>
+          <Ionicons name="scan-outline" size={24} color={COLORS.goldSoft} />
         </View>
-        <View style={styles.prescriptionContent}>
-          <Text style={styles.prescriptionKicker}>MON ORDONNANCE</Text>
-          <Text style={styles.prescriptionTitle}>
-            {prescriptionName || 'Ajouter une prescription'}
+        <View style={styles.profileFeatureContent}>
+          <Text style={styles.profileFeatureKicker}>ESSAYAGE VIRTUEL</Text>
+          <Text style={styles.profileFeatureTitle}>Virtual Mirror 2.5D</Text>
+          <Text style={styles.profileFeatureText}>
+            Essayez les montures compatibles avec suivi du visage directement sur votre appareil.
           </Text>
-          <Text style={styles.prescriptionText}>
-            {prescriptionName ? 'Document enregistré sur cet appareil.' : 'PDF, JPG, PNG ou WEBP.'}
-          </Text>
-          <View style={styles.prescriptionActions}>
-            <Pressable onPress={pickPrescription} style={styles.prescriptionButton}>
-              <Text style={styles.prescriptionButtonText}>
-                {prescriptionName ? 'REMPLACER' : 'CHOISIR UN FICHIER'}
-              </Text>
-            </Pressable>
-            {prescriptionName ? (
-              <Pressable onPress={() => void removePrescription()}>
-                <Text style={styles.prescriptionRemove}>RETIRER</Text>
-              </Pressable>
-            ) : null}
-          </View>
+          <Pressable onPress={() => setTryOn(eyewear[0])} style={styles.profileFeatureButton}>
+            <Text style={styles.profileFeatureButtonText}>OUVRIR LE MIROIR</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -624,7 +570,7 @@ function AppContent() {
       />
 
       <View style={styles.versionBox}>
-        <Text style={styles.versionText}>LOZA OPTIQUE · RELEASE 1.0</Text>
+      <Text style={styles.versionText}>LOZA OPTIQUE · RELEASE 1.0.1</Text>
         <Text style={styles.versionSubtext}>Android · Virtual Mirror 2.5D · Casablanca</Text>
       </View>
     </ScrollView>
@@ -827,18 +773,17 @@ function AppContent() {
               ))}
             </View>
 
-            <Pressable onPress={pickPrescription} style={styles.bookingPrescription}>
-              <View style={styles.bookingPrescriptionIcon}>
-                <Text style={styles.bookingPrescriptionIconText}>Rx</Text>
+            <View style={styles.bookingInfo}>
+              <View style={styles.bookingInfoIcon}>
+                <Ionicons name="information-circle-outline" size={22} color={COLORS.goldSoft} />
               </View>
-              <View style={styles.bookingPrescriptionCopy}>
-                <Text style={styles.bookingPrescriptionTitle}>
-                  {prescriptionName || 'Ajouter une ordonnance'}
+              <View style={styles.bookingInfoCopy}>
+                <Text style={styles.bookingInfoTitle}>Aucun document requis</Text>
+                <Text style={styles.bookingInfoText}>
+                  La boutique confirmera le créneau par e-mail ou téléphone.
                 </Text>
-                <Text style={styles.bookingPrescriptionText}>PDF ou photo</Text>
               </View>
-              <Text style={styles.bookingPrescriptionAction}>CHOISIR</Text>
-            </Pressable>
+            </View>
 
             <Pressable style={styles.confirmBookingButton} onPress={confirmBooking}>
               <Text style={styles.confirmBookingText}>ENVOYER LA DEMANDE</Text>
@@ -875,7 +820,31 @@ function AppContent() {
   );
 }
 
+function LaunchSplash() {
+  return (
+    <View style={styles.launchSplash}>
+      <StatusBar style="light" />
+      <Image
+        source={require('./assets/brand/splash.png')}
+        style={styles.launchSplashImage}
+        resizeMode="cover"
+      />
+    </View>
+  );
+}
+
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return <LaunchSplash />;
+  }
+
   return (
     <SafeAreaProvider>
       <AppContent />
@@ -888,11 +857,19 @@ const CARD_WIDTH = (SCREEN_WIDTH - 48) / 2;
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: COLORS.ivory },
   content: { flex: 1 },
+  launchSplash: {
+    flex: 1,
+    backgroundColor: '#071D22',
+  },
+  launchSplashImage: {
+    width: '100%',
+    height: '100%',
+  },
   page: { paddingHorizontal: 18, paddingBottom: 126 },
   pressed: { opacity: 0.78, transform: [{ scale: 0.985 }] },
 
-  logo: { width: 236, height: 74 },
-  logoCompact: { width: 154, height: 52 },
+  logo: { width: 94, height: 94 },
+  logoCompact: { width: 60, height: 60 },
   logoLight: { opacity: 1 },
 
   header: {
@@ -1164,7 +1141,7 @@ const styles = StyleSheet.create({
   profileHero: { borderRadius: 28, padding: 22, marginTop: 10 },
   profileHeroTitle: { color: COLORS.white, fontFamily: TYPE.display, fontSize: 26, lineHeight: 29, fontWeight: '700', marginTop: 22 },
   profileHeroText: { color: '#B9CFCC', fontSize: 12, lineHeight: 18, marginTop: 10 },
-  prescriptionCard: {
+  profileFeatureCard: {
     borderRadius: 24,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -1174,7 +1151,7 @@ const styles = StyleSheet.create({
     gap: 14,
     marginTop: 14,
   },
-  prescriptionIcon: {
+  profileFeatureIcon: {
     width: 56,
     height: 56,
     borderRadius: 18,
@@ -1182,22 +1159,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  prescriptionIconText: { color: COLORS.goldSoft, fontSize: 18, fontWeight: '900' },
-  prescriptionContent: { flex: 1 },
-  prescriptionKicker: { color: COLORS.gold, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
-  prescriptionTitle: { color: COLORS.ink, fontSize: 15, fontWeight: '800', marginTop: 6 },
-  prescriptionText: { color: COLORS.muted, fontSize: 10, lineHeight: 15, marginTop: 5 },
-  prescriptionActions: { flexDirection: 'row', alignItems: 'center', gap: 14, marginTop: 13 },
-  prescriptionButton: {
+  profileFeatureContent: { flex: 1 },
+  profileFeatureKicker: { color: COLORS.gold, fontSize: 8, fontWeight: '900', letterSpacing: 1.4 },
+  profileFeatureTitle: { color: COLORS.ink, fontSize: 15, fontWeight: '800', marginTop: 6 },
+  profileFeatureText: { color: COLORS.muted, fontSize: 10, lineHeight: 15, marginTop: 5 },
+  profileFeatureButton: {
+    alignSelf: 'flex-start',
     height: 37,
     borderRadius: 19,
     backgroundColor: COLORS.petrol,
     paddingHorizontal: 14,
     alignItems: 'center',
     justifyContent: 'center',
+    marginTop: 13,
   },
-  prescriptionButtonText: { color: COLORS.white, fontSize: 8, fontWeight: '900', letterSpacing: 0.7 },
-  prescriptionRemove: { color: COLORS.danger, fontSize: 8, fontWeight: '900', letterSpacing: 0.7 },
+  profileFeatureButtonText: { color: COLORS.white, fontSize: 8, fontWeight: '900', letterSpacing: 0.7 },
   profileSectionTitle: { color: COLORS.ink, fontSize: 20, fontWeight: '800', marginTop: 28, marginBottom: 12 },
   contactAction: {
     minHeight: 70,
@@ -1364,7 +1340,7 @@ const styles = StyleSheet.create({
   bookingTimeActive: { backgroundColor: '#D9E6E2', borderColor: COLORS.petrol },
   bookingTimeText: { color: COLORS.muted, fontSize: 11 },
   bookingTimeTextActive: { color: COLORS.petrol, fontWeight: '900' },
-  bookingPrescription: {
+  bookingInfo: {
     minHeight: 70,
     borderRadius: 18,
     borderWidth: 1,
@@ -1375,7 +1351,7 @@ const styles = StyleSheet.create({
     padding: 11,
     marginTop: 17,
   },
-  bookingPrescriptionIcon: {
+  bookingInfoIcon: {
     width: 43,
     height: 43,
     borderRadius: 14,
@@ -1383,11 +1359,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bookingPrescriptionIconText: { color: COLORS.goldSoft, fontSize: 14, fontWeight: '900' },
-  bookingPrescriptionCopy: { flex: 1, marginLeft: 11 },
-  bookingPrescriptionTitle: { color: COLORS.ink, fontSize: 12, fontWeight: '800' },
-  bookingPrescriptionText: { color: COLORS.muted, fontSize: 9, marginTop: 4 },
-  bookingPrescriptionAction: { color: COLORS.petrol, fontSize: 8, fontWeight: '900' },
+  bookingInfoCopy: { flex: 1, marginLeft: 11 },
+  bookingInfoTitle: { color: COLORS.ink, fontSize: 12, fontWeight: '800' },
+  bookingInfoText: { color: COLORS.muted, fontSize: 9, lineHeight: 14, marginTop: 4 },
   confirmBookingButton: {
     height: 56,
     borderRadius: 18,
