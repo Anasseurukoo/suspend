@@ -47,7 +47,7 @@ export default function Hero() {
           >
             <div className="max-w-xl">
               <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#a27d38]">
-                Opticien à Casablanca depuis 1998
+                Opticien à Casablanca depuis 1989
               </p>
 
               <h1 className="mt-6 text-5xl font-normal leading-[0.95] tracking-[-0.055em] sm:text-6xl lg:text-7xl xl:text-[5.4rem] [font-family:Georgia,serif]">

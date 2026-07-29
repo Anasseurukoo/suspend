@@ -71,7 +71,7 @@ export default function AppointmentModal({
       ].join("\n"),
     );
 
-    window.location.href = `mailto:lozaoptique@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:lozaoptiquesupport@gmail.com?subject=${subject}&body=${body}`;
   };
 
   const handleClose = () => {

@@ -196,7 +196,7 @@ export function AboutSection() {
           </p>
 
           <p className="mt-5 text-7xl text-[#d6bd82] [font-family:Georgia,serif]">
-            1998
+            1989
           </p>
 
           <p className="mt-4 text-lg leading-8 text-white/70">
@@ -292,13 +292,13 @@ export function ContactSection() {
               </Link>
 
               <Link
-                href="mailto:lozaoptique@gmail.com"
+                href="mailto:lozaoptiquesupport@gmail.com"
                 className="rounded-2xl border border-[#103943]/10 bg-white p-6"
               >
                 <Mail className="text-[#a27d38]" size={21} />
                 <p className="mt-4 text-sm text-[#526b6c]">Email</p>
                 <p className="mt-1 break-all font-semibold">
-                  lozaoptique@gmail.com
+                  lozaoptiquesupport@gmail.com
                 </p>
               </Link>
 
@@ -382,7 +382,7 @@ export function HomeFooter() {
             LOZA OPTIQUE
           </p>
           <p className="mt-2 text-sm text-white/55">
-            Opticien à Casablanca depuis 1998.
+            Opticien à Casablanca depuis 1989.
           </p>
         </div>
 
@@ -395,8 +395,16 @@ export function HomeFooter() {
         </nav>
 
         <p className="text-xs text-white/45">
-          © 2026 Loza Optique.
-        </p>
+  © 2026 Loza Optique.{" "}
+  <a
+    href="https://builtbyanas.com"
+    target="_blank"
+    rel="noreferrer"
+    className="transition hover:text-[#d6bd82]"
+  >
+    BuiltByAnas.com
+  </a>
+</p>
       </div>
     </footer>
   );

@@ -26,7 +26,7 @@ const navLinks = [
 const contactLinks = [
   {
     name: "Téléphone",
-    href: "tel:+212522821283",
+    href: "tel:+212625494949",
     icon: Phone,
   },
   {
@@ -36,7 +36,7 @@ const contactLinks = [
   },
   {
     name: "Email",
-    href: "mailto:lozaoptique@gmail.com",
+    href: "mailto:lozaoptiquesupport@gmail.com",
     icon: Mail,
   },
 ];
@@ -122,11 +122,11 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-3 lg:flex">
             <Link
-              href="tel:+212522821283"
+              href="tel:+212625494949"
               className="hidden items-center gap-2 text-xs text-white/75 transition hover:text-[#d6bd82] 2xl:flex"
             >
               <Phone size={15} />
-              +212 522 82 12 83
+              +212 625 49 49 49 · Abd Elhamid Rizki
             </Link>
 
             <span className="hidden h-5 w-px bg-white/15 2xl:block" />
