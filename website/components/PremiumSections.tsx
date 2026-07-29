@@ -283,12 +283,12 @@ export function ContactSection() {
 
             <div className="mt-9 grid gap-4 sm:grid-cols-2">
               <Link
-                href="tel:+212522821283"
+                href="tel:+212625494949"
                 className="rounded-2xl border border-[#103943]/10 bg-white p-6"
               >
                 <Phone className="text-[#a27d38]" size={21} />
                 <p className="mt-4 text-sm text-[#526b6c]">Téléphone</p>
-                <p className="mt-1 font-semibold">+212 522 82 12 83</p>
+                <p className="mt-1 font-semibold">+212 625 49 49 49</p>
               </Link>
 
               <Link
@@ -415,7 +415,7 @@ export function MobileStickyBar() {
     <div className="fixed inset-x-0 bottom-0 z-50 border-t border-white/10 bg-[#071d22]/95 p-3 backdrop-blur md:hidden">
       <div className="mx-auto grid max-w-md grid-cols-2 gap-3">
         <Link
-          href="tel:+212522821283"
+          href="tel:+212625494949"
           className="flex items-center justify-center gap-2 rounded-xl border border-white/20 px-4 py-3 text-sm font-semibold text-white"
         >
           <Phone size={17} />

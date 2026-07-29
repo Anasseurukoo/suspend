@@ -277,7 +277,7 @@ function AppContent() {
           'Appelez Loza au +212 5 22 82 12 83 pour confirmer votre rendez-vous.',
           [
             { text: 'Annuler', style: 'cancel' },
-            { text: 'Appeler', onPress: () => void Linking.openURL('tel:+212522821283') },
+            { text: 'Appeler', onPress: () => void Linking.openURL('tel:+212625494949') },
           ],
         );
         return;
@@ -544,7 +544,7 @@ function AppContent() {
       <ContactAction
         icon="call-outline"
         label="+212 5 22 82 12 83"
-        onPress={() => void Linking.openURL('tel:+212522821283')}
+        onPress={() => void Linking.openURL('tel:+212625494949')}
       />
       <ContactAction
         icon="mail-outline"

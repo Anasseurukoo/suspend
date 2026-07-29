@@ -232,7 +232,7 @@ export default function AppointmentModal({
 
           <p className="text-center text-xs leading-5 text-[#6c7d7b]">
             Aucun rendez-vous n’est confirmé avant l’appel de Loza Optique au
-            +212 522 82 12 83.
+            +212 625 49 49 49.
           </p>
         </form>
       </div>
