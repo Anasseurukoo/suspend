@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Camera, Check, Ruler, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Ruler, Sparkles } from "lucide-react";
 import type { Product } from "../lib/products";
 import { products } from "../lib/products";
 import Header from "./Header";
 import Footer from "./Footer";
+import TryOnLauncher from "./TryOnLauncher";
 import ProductCard from "./ProductCard";
 import ImageWithFallback from "./ImageWithFallback";
 
@@ -55,7 +56,7 @@ export default function ProductPage({ product }: { product: Product }) {
 
             <div className="product-actions">
               <Link href={`/rendez-vous?frame=${encodeURIComponent(product.reference)}`} className="button button-dark">Essayer en boutique <ArrowRight size={17} /></Link>
-              <Link href={`/essayage?frame=${encodeURIComponent(product.reference)}`} className="button button-outline-dark"><Camera size={17} /> Essayage virtuel</Link>
+              <TryOnLauncher frame={product.reference} label="Essayage virtuel" className="button button-outline-dark" />
             </div>
             <p className="product-availability">La disponibilité est confirmée directement par Loza Optique.</p>
           </div>
