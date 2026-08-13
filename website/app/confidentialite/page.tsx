@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
 import PrivacyPage from "../../components/PrivacyPage";
-export const metadata: Metadata = { title: "Confidentialité" };
+import { pageMetadata } from "../../lib/seo";
+export const metadata = pageMetadata({ title: "Confidentialité", description: "Informations sur les données, la prise de contact et le fonctionnement de l'essayage virtuel Loza Optique.", path: "/confidentialite" });
 export default function Page() { return <PrivacyPage />; }

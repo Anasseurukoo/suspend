@@ -1,73 +1,107 @@
-import Link from "next/link";
-import { ArrowUpRight, CalendarDays, MapPin, Phone } from "lucide-react";
+﻿import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { business, navigation } from "../lib/config";
 
 export default function Footer() {
   return (
     <footer className="footer">
-      <div className="footer-contact-band">
-        <div className="shell footer-contact-band-inner">
-          <div className="footer-contact-item footer-contact-phone">
-            <Phone size={18} aria-hidden="true" />
-            <div>
-              <span>Contact</span>
-              <a href={`tel:${business.phoneHref}`}>{business.phoneDisplay} · {business.contactName}</a>
-            </div>
-          </div>
-
-          <div className="footer-contact-divider" aria-hidden="true" />
-
-          <div className="footer-contact-item">
-            <MapPin size={18} aria-hidden="true" />
-            <div>
-              <span>Adresse</span>
-              <strong>{business.city}</strong>
-            </div>
-          </div>
-
-          <Link href="/rendez-vous" className="footer-contact-book">
-            <CalendarDays size={18} aria-hidden="true" />
-            Prendre rendez-vous
-          </Link>
-        </div>
-      </div>
-
       <div className="shell footer-grid">
+
         <div className="footer-brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/brand/logo-navbar-v3-tight.png" alt="Loza Optique" />
-          <p>Montures, technologies verrières et accompagnement attentif au cœur de Casablanca depuis 1989.</p>
+          <Link
+            href="/"
+            className="footer-brand-link"
+            aria-label="Loza Optique - Accueil"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/brand/logo-navbar-v3-tight.png"
+              alt="Loza Optique"
+              width={640}
+              height={184}
+            />
+          </Link>
+
+          <p>
+            Montures, technologies verri&egrave;res et accompagnement attentif
+            au c&oelig;ur de Casablanca depuis 1989.
+          </p>
         </div>
 
         <div>
           <p className="footer-title">Explorer</p>
-          <nav className="footer-links" aria-label="Navigation de pied de page">
-            {navigation.map((item) => <Link key={item.href} href={item.href}>{item.label}</Link>)}
-            <Link href="/confidentialite">Confidentialité</Link>
+
+          <nav
+            className="footer-links"
+            aria-label="Navigation de pied de page"
+          >
+            {navigation.map((item) => (
+              <Link key={item.href} href={item.href}>
+                {item.label}
+              </Link>
+            ))}
+
+            <Link href="/confidentialite">
+              Confidentialit&eacute;
+            </Link>
           </nav>
         </div>
 
         <div>
           <p className="footer-title">Visiter</p>
+
           <address className="footer-address">
             <span>{business.address}</span>
-            <span>Vendredi : fermé</span>
-            <a href={`tel:${business.phoneHref}`}>{business.phoneDisplay}</a>
-            <span>{business.contactName}</span>
-            <a href={`mailto:${business.email}`}>{business.email}</a>
+
+            <span>
+              Vendredi : ferm&eacute;
+            </span>
+
+            <a href={`tel:${business.phoneHref}`}>
+              {business.phoneDisplay}
+            </a>
+
+            <span>
+              {business.contactName}
+            </span>
+
+            <a href={`mailto:${business.email}`}>
+              {business.email}
+            </a>
           </address>
         </div>
 
         <div className="footer-cta">
-          <p className="footer-title">Un conseil personnalisé</p>
-          <Link href="/rendez-vous" className="footer-big-link">
-            Préparer votre visite <ArrowUpRight size={24} />
+          <p className="footer-title">
+            Un conseil personnalis&eacute;
+          </p>
+
+          <Link
+            href="/rendez-vous"
+            className="footer-big-link"
+          >
+            <span>
+              Pr&eacute;parer votre visite
+            </span>
+
+            <ArrowUpRight size={24} />
           </Link>
         </div>
+
       </div>
+
       <div className="shell footer-bottom">
-        <span>© {new Date().getFullYear()} Loza Optique</span>
-        <a href="https://builtbyanas.com" target="_blank" rel="noreferrer">Site conçu par BuiltByAnas.com</a>
+        <span>
+          &copy; {new Date().getFullYear()} Loza Optique
+        </span>
+
+        <a
+          href="https://builtbyanas.com"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Site con&ccedil;u par BuiltByAnas.com
+        </a>
       </div>
     </footer>
   );

@@ -6,6 +6,7 @@ export const business = {
   phoneDisplay: "+212 625 49 49 49",
   contactName: "Abd Elhamid Rizki",
   phoneHref: "+212625494949",
+  whatsappNumber: "212625494949",
   email: "lozaoptiquesupport@gmail.com",
   fridayClosed: true,
   website: "https://lozaoptique.com/",

@@ -10,7 +10,22 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const product = getProductBySlug(slug);
-  return product ? { title: `${product.name} · ${product.reference}`, description: product.description } : { title: "Monture" };
+  if (!product) return { title: "Monture" };
+  const canonical = `/produits/${product.slug}/`;
+  return {
+    title: `${product.name} · ${product.reference}`,
+    description: `${product.description} Découvrez cette monture chez Loza Optique à Casablanca.`,
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      locale: "fr_MA",
+      title: `${product.name} · ${product.reference} | Loza Optique`,
+      description: product.description,
+      url: canonical,
+      images: [{ url: product.images[0], alt: `${product.name}, ${product.reference}` }],
+    },
+    twitter: { card: "summary_large_image", title: `${product.name} · ${product.reference}`, description: product.description, images: [product.images[0]] },
+  };
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

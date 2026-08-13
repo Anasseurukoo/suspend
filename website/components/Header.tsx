@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { Menu, X } from "lucide-react";
@@ -28,9 +28,8 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
       <a className="skip-link" href="#main">Aller au contenu</a>
       <header className={`header ${overlay ? "header-overlay" : ""} ${scrolled ? "header-scrolled" : ""}`}>
         <div className="header-inner header-inner-clean">
-          <Link href="/" className="header-brand" aria-label="Loza Optique, accueil">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/logo-navbar-v3-tight.png" alt="Loza Optique" />
+          <Link href="/" className="header-brand" aria-label="Loza Optique, accueil">{/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/logo-navbar-v3-tight.png" alt="Loza Optique" width={640} height={184} />
           </Link>
 
           <nav className="header-nav" aria-label="Navigation principale">
@@ -56,7 +55,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
 
       <div id="mobile-navigation" className={`mobile-menu ${open ? "mobile-menu-open" : ""}`} aria-hidden={!open}>
         <div className="mobile-menu-inner">
-          <p className="eyebrow light">Loza Optique · Casablanca</p>
+          <p className="eyebrow light">Loza Optique Â· Casablanca</p>
           <nav aria-label="Navigation mobile">
             {navigation.map((item, index) => (
               <Link key={item.href} href={item.href} onClick={() => setOpen(false)}>
@@ -69,7 +68,7 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
             <Link href="/rendez-vous" className="button button-gold" onClick={() => setOpen(false)}>
               Demander un rendez-vous
             </Link>
-            <a href={`tel:${business.phoneHref}`}>{business.phoneDisplay} · {business.contactName}</a>
+            <a href={`tel:${business.phoneHref}`}>{business.phoneDisplay} Â· {business.contactName}</a>
             <a href={`mailto:${business.email}`}>{business.email}</a>
           </div>
         </div>
@@ -77,3 +76,4 @@ export default function Header({ overlay = false }: { overlay?: boolean }) {
     </>
   );
 }
+

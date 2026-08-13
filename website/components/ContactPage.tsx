@@ -32,7 +32,7 @@ export default function ContactPage() {
             <div className="contact-form-panel">
               <p className="eyebrow"><span /> Demande de rendez-vous</p>
               <h2>Préparer votre visite.</h2>
-              <p>Choisissez un créneau souhaité. Loza vous contacte ensuite pour le confirmer personnellement.</p>
+              <p>Choisissez la date et l’heure souhaitées. Loza vous contacte ensuite pour confirmer le créneau.</p>
               <AppointmentForm />
             </div>
           </div>

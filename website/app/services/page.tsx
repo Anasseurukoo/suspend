@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
 import ServicesPage from "../../components/ServicesPage";
-export const metadata: Metadata = { title: "Services" };
+import { pageMetadata } from "../../lib/seo";
+export const metadata = pageMetadata({ title: "Services d'opticien à Casablanca", description: "Conseil morphologique, examen visuel, montage, ajustement, entretien et réparation de lunettes chez Loza Optique à Casablanca.", path: "/services" });
 export default function Page() { return <ServicesPage />; }

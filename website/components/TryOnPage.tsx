@@ -34,7 +34,7 @@ export default function TryOnPage() {
           </div>
         </section>
 
-        <section className="tryon-demo-section">
+        <section id="demo" className="tryon-demo-section">
           <div className="shell tryon-live">
             <div className="tryon-live-head">
               <div>
@@ -63,7 +63,7 @@ export default function TryOnPage() {
               <li><CheckCircle2 size={18} /> Ajustement final en boutique</li>
             </ul>
 
-            <p className="tryon-status tryon-status-dark"><span aria-hidden="true" /> Exclusivité Loza Optique · Casablanca</p>
+            <p className="tryon-status tryon-status-dark"><span aria-hidden="true" /> Try-on Demo · Exclusif au Maroc</p>
           </div>
         </section>
 

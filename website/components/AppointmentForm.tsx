@@ -1,16 +1,45 @@
 "use client";
 
-import { FormEvent, useMemo, useRef, useState } from "react";
-import { Send, CheckCircle2 } from "lucide-react";
+import { ChangeEvent, FormEvent, useMemo, useState } from "react";
+import { CheckCircle2, Mail, MessageCircle, Phone } from "lucide-react";
 import { business } from "../lib/config";
 
 type Errors = Partial<Record<"name" | "phone" | "date" | "time", string>>;
 
+function isFriday(date: string) {
+  return Boolean(date) && new Date(`${date}T12:00:00`).getDay() === 5;
+}
+
 export default function AppointmentForm({ frameReference = "" }: { frameReference?: string }) {
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState("");
-  const formRef = useRef<HTMLFormElement | null>(null);
-  const today = useMemo(() => new Date().toISOString().slice(0, 10), []);
+  const [selectedDate, setSelectedDate] = useState("");
+  const today = useMemo(() => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }, []);
+
+  function handleDateChange(event: ChangeEvent<HTMLInputElement>) {
+    const value = event.target.value;
+    setStatus("");
+
+    if (isFriday(value)) {
+      setSelectedDate("");
+      setErrors((current) => ({ ...current, date: "La boutique est fermée le vendredi. Choisissez un autre jour." }));
+      return;
+    }
+
+    setSelectedDate(value);
+    setErrors((current) => {
+      if (!current.date) return current;
+      const next = { ...current };
+      delete next.date;
+      return next;
+    });
+  }
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -26,7 +55,7 @@ export default function AppointmentForm({ frameReference = "" }: { frameReferenc
     if (phone.replace(/\D/g, "").length < 8) nextErrors.phone = "Indiquez un numéro de téléphone valide.";
     if (!date) nextErrors.date = "Choisissez une date.";
     if (date && date < today) nextErrors.date = "Choisissez une date à venir.";
-    if (date && new Date(`${date}T12:00:00`).getDay() === 5) nextErrors.date = "La boutique est fermée le vendredi.";
+    if (isFriday(date)) nextErrors.date = "La boutique est fermée le vendredi. Choisissez un autre jour.";
     if (!time) nextErrors.time = "Choisissez une heure.";
 
     setErrors(nextErrors);
@@ -39,8 +68,9 @@ export default function AppointmentForm({ frameReference = "" }: { frameReferenc
     }
 
     const message = String(data.get("message") || "").trim();
-    const subject = "Demande de rendez-vous — Loza Optique";
     const body = [
+      "Bonjour Loza Optique, je souhaite préparer une visite.",
+      "",
       `Nom : ${name}`,
       `Téléphone : ${phone}`,
       `Date souhaitée : ${date}`,
@@ -48,15 +78,16 @@ export default function AppointmentForm({ frameReference = "" }: { frameReferenc
       frameReference ? `Monture : ${frameReference}` : "",
       message ? `Message : ${message}` : "",
       "",
-      "Cette demande reste à confirmer personnellement par Loza Optique.",
+      "Je comprends que le créneau reste à confirmer par Loza Optique.",
     ].filter(Boolean).join("\n");
 
-    setStatus("Votre application e-mail va s’ouvrir. Loza confirmera ensuite le créneau personnellement.");
-    window.location.href = `mailto:${business.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const whatsappUrl = `https://wa.me/${business.whatsappNumber}?text=${encodeURIComponent(body)}`;
+    setStatus("Votre demande est prête. WhatsApp va s’ouvrir et Loza confirmera ensuite le créneau.");
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   }
 
   return (
-    <form ref={formRef} className="appointment-form" onSubmit={submit} noValidate>
+    <form className="appointment-form" onSubmit={submit} noValidate>
       <div className="form-field">
         <label htmlFor="appointment-name">Nom</label>
         <input id="appointment-name" name="name" autoComplete="name" aria-invalid={Boolean(errors.name)} aria-describedby={errors.name ? "name-error" : undefined} />
@@ -64,19 +95,30 @@ export default function AppointmentForm({ frameReference = "" }: { frameReferenc
       </div>
       <div className="form-field">
         <label htmlFor="appointment-phone">Téléphone</label>
-        <input id="appointment-phone" name="phone" type="tel" autoComplete="tel" aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "phone-error" : undefined} />
+        <input id="appointment-phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" aria-invalid={Boolean(errors.phone)} aria-describedby={errors.phone ? "phone-error" : undefined} />
         {errors.phone && <span id="phone-error" className="field-error">{errors.phone}</span>}
       </div>
       <div className="form-field">
         <label htmlFor="appointment-date">Date souhaitée</label>
-        <input id="appointment-date" name="date" type="date" min={today} aria-invalid={Boolean(errors.date)} aria-describedby={errors.date ? "date-error" : undefined} />
+        <input
+          id="appointment-date"
+          name="date"
+          type="date"
+          min={today}
+          value={selectedDate}
+          onChange={handleDateChange}
+          autoComplete="off"
+          aria-invalid={Boolean(errors.date)}
+          aria-describedby={errors.date ? "date-error" : "date-hint"}
+        />
+        <span id="date-hint" className="field-hint">Boutique fermée le vendredi — choisissez un autre jour.</span>
         {errors.date && <span id="date-error" className="field-error">{errors.date}</span>}
       </div>
       <div className="form-field">
         <label htmlFor="appointment-time">Heure souhaitée</label>
         <select id="appointment-time" name="time" defaultValue="" aria-invalid={Boolean(errors.time)} aria-describedby={errors.time ? "time-error" : undefined}>
           <option value="" disabled>Choisir une heure</option>
-          {['09:00', '10:00', '11:00', '12:00', '15:00', '16:00', '17:00', '18:00'].map((time) => <option key={time} value={time}>{time}</option>)}
+          {["09:00", "10:00", "11:00", "12:00", "15:00", "16:00", "17:00", "18:00"].map((time) => <option key={time} value={time}>{time}</option>)}
         </select>
         {errors.time && <span id="time-error" className="field-error">{errors.time}</span>}
       </div>
@@ -85,9 +127,13 @@ export default function AppointmentForm({ frameReference = "" }: { frameReferenc
         <textarea id="appointment-message" name="message" rows={4} defaultValue={frameReference ? `Je souhaite découvrir la monture ${frameReference}.` : ""} />
       </div>
       <button className="button button-gold form-submit" type="submit">
-        Préparer ma demande <Send size={17} />
+        Envoyer la demande sur WhatsApp <MessageCircle size={17} />
       </button>
-      <p className="form-note">Aucun rendez-vous n’est confirmé automatiquement. Loza vous contacte pour valider le créneau.</p>
+      <div className="form-alternatives" aria-label="Autres moyens de contact">
+        <a href={`tel:${business.phoneHref}`}><Phone size={15} /> Appeler</a>
+        <a href={`mailto:${business.email}`}><Mail size={15} /> E-mail</a>
+      </div>
+      <p className="form-note">La demande n’est pas une confirmation : Loza vous contacte pour valider le créneau.</p>
       {status && <p className="form-status" aria-live="polite"><CheckCircle2 size={18} /> {status}</p>}
     </form>
   );

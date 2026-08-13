@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
 import CollectionsPage from "../../../components/CollectionsPage";
-export const metadata: Metadata = { title: "Montures optiques" };
+import { pageMetadata } from "../../../lib/seo";
+export const metadata = pageMetadata({ title: "Montures optiques à Casablanca", description: "Explorez une sélection de montures optiques à Casablanca et bénéficiez du conseil et de l'ajustement Loza Optique en boutique.", path: "/collections/vue" });
 export default function Page() { return <CollectionsPage initialCategory="vue" />; }

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Loza Optique",
     short_name: "Loza",
-    description: "Loza Optique Casablanca",
+    description: "Opticien à Casablanca — montures, conseil, technologies verrières et essayage.",
     start_url: "/",
     display: "standalone",
     background_color: "#071f20",

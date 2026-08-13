@@ -19,6 +19,7 @@ export default function ImageWithFallback({
     return <div className={`image-fallback ${className}`} role="img" aria-label={alt}>Image indisponible</div>;
   }
 
+  // Assets are pre-compressed for the static GitHub Pages export.
   // eslint-disable-next-line @next/next/no-img-element
-  return <img src={src} alt={alt} className={className} loading={loading} onError={() => setFailed(true)} />;
+  return <img src={src} alt={alt} className={className} loading={loading} decoding="async" fetchPriority={loading === "eager" ? "high" : "auto"} onError={() => setFailed(true)} />;
 }

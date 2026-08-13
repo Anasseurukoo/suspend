@@ -55,6 +55,16 @@ export default function HomePage() {
                 <Link href="/collections" className="button button-gold">Découvrir les collections <ArrowRight size={18} /></Link>
                 <Link href="/rendez-vous" className="button button-glass"><CalendarDays size={18} /> Préparer une visite</Link>
               </div>
+              <Link
+                href="/essayage#demo"
+                className="hero-exclusive-demo"
+                aria-label="Ouvrir la démo Try-on, exclusive au Maroc"
+              >
+                <Camera size={17} aria-hidden="true" />
+                <span>Try-on Demo</span>
+                <strong>Exclusif au Maroc</strong>
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </motion.div>
 
           </div>
@@ -62,7 +72,7 @@ export default function HomePage() {
           <div className="shell hero-bottom">
             <a href="#selection" className="hero-scroll">Explorer <ArrowDown size={16} /></a>
             <div className="hero-proof">
-              <span><Sparkles size={15} /> Sélection multimarque</span>
+              <span><Sparkles size={15} /> Sélection choisie</span>
               <span><ScanFace size={15} /> Conseil personnalisé</span>
               <span><Glasses size={15} /> Ajustement en boutique</span>
             </div>

@@ -18,7 +18,7 @@ export default function AppointmentPage() {
             <div>
               <p className="eyebrow light"><span /> Rendez-vous · Casablanca</p>
               <h1>Un temps pour<br /><em>bien choisir.</em></h1>
-              <p>Préparez votre demande. Loza confirme personnellement le créneau avant votre visite.</p>
+              <p>Préparez votre demande. Loza confirme le créneau avant votre visite. La boutique est fermée le vendredi.</p>
               <div className="appointment-page-facts">
                 <span>Conseil personnalisé</span>
                 <span>Essayage en boutique</span>

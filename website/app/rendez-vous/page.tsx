@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { Suspense } from "react";
 import AppointmentPage from "../../components/AppointmentPage";
-export const metadata: Metadata = { title: "Rendez-vous" };
+import { pageMetadata } from "../../lib/seo";
+export const metadata = pageMetadata({ title: "Préparer un rendez-vous", description: "Préparez votre visite chez Loza Optique à Casablanca et envoyez votre demande de créneau directement via WhatsApp.", path: "/rendez-vous" });
 export default function Page() { return <Suspense fallback={<div className="page-loading">Chargement…</div>}><AppointmentPage /></Suspense>; }
