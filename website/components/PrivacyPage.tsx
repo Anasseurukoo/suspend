@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import Header from "./Header";
 import Footer from "./Footer";
 import PageHero from "./PageHero";
